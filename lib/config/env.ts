@@ -17,23 +17,23 @@ export const env = {
 // API エンドポイント
 export const API_ENDPOINTS = {
   // Auth
-  LOGIN: `${env.API_BASE_URL}/auth/login`,
-  REGISTER: `${env.API_BASE_URL}/auth/register`,
+  LOGIN: `${env.API_BASE_URL}/api/v1/auth/login`,
+  REGISTER: `${env.API_BASE_URL}/api/v1/auth/register`,
 
   // Users
-  USER_ME: `${env.API_BASE_URL}/users/me`,
+  USER_ME: `${env.API_BASE_URL}/api/v1/users/me`,
 
   // Tasks
-  TASKS: `${env.API_BASE_URL}/tasks`,
-  TASK_BY_ID: (id: string) => `${env.API_BASE_URL}/tasks/${id}`,
+  TASKS: `${env.API_BASE_URL}/api/v1/tasks`,
+  TASK_BY_ID: (id: string) => `${env.API_BASE_URL}/api/v1/tasks/${id}`,
 
   // Properties
-  PROPERTIES: `${env.API_BASE_URL}/properties`,
-  PROPERTY_BY_ID: (id: string) => `${env.API_BASE_URL}/properties/${id}`,
+  PROPERTIES: `${env.API_BASE_URL}/api/v1/properties`,
+  PROPERTY_BY_ID: (id: string) => `${env.API_BASE_URL}/api/v1/properties/${id}`,
 
   // AI
-  AI_SUGGESTIONS: `${env.API_BASE_URL}/ai/suggestions`,
-  AI_BULK_WASTE: `${env.API_BASE_URL}/ai/bulk_waste_collection_date`,
+  AI_SUGGESTIONS: `${env.API_BASE_URL}/api/v1/ai/suggestions`,
+  AI_BULK_WASTE: `${env.API_BASE_URL}/api/v1/ai/bulk_waste_collection_date`,
 } as const
 
 // 設定の検証

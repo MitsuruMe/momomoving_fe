@@ -44,6 +44,9 @@ NEXT_PUBLIC_APP_NAME=ももとお引っ越し
 NEXT_PUBLIC_APP_VERSION=1.0.0
 ```
 
+**注意**: APIエンドポイントは自動的に `/api/v1` が付与されます。
+例：`https://momomoving-be.onrender.com` → `https://momomoving-be.onrender.com/api/v1/auth/login`
+
 ### 3. 開発サーバーの起動
 
 ```bash

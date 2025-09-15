@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Monomaniac_One, Noto_Sans_JP } from "next/font/google"
 import "./globals.css"
 import { Suspense } from "react"
+import { AuthProvider } from "@/context/AuthContext"
 
 const monomaniacOne = Monomaniac_One({
   weight: "400",
@@ -17,9 +18,8 @@ const notoSansJP = Noto_Sans_JP({
 })
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "ももとお引っ越し",
+  description: "引越しをサポートするアプリケーション",
 }
 
 export default function RootLayout({
@@ -28,9 +28,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body className={`font-sans ${monomaniacOne.variable} ${notoSansJP.variable}`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <AuthProvider>
+          <Suspense fallback={null}>{children}</Suspense>
+        </AuthProvider>
       </body>
     </html>
   )

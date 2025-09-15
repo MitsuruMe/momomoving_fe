@@ -2,9 +2,12 @@
 
 import { useRouter } from "next/navigation"
 import { Check, Home, Search, Star, MoreHorizontal } from "lucide-react"
+import ProtectedRoute from "@/components/ProtectedRoute"
+import { useAuth } from "@/context/AuthContext"
 
-export default function MovingApp() {
+function MovingAppContent() {
   const router = useRouter()
+  const { logout } = useAuth()
 
   const tasks = [
     {
@@ -33,11 +36,21 @@ export default function MovingApp() {
     },
   ]
 
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <div className="w-full max-w-sm mx-auto min-h-screen bg-white relative">
       {/* Header */}
-      <header className="py-4 text-center border-b border-gray-100" style={{ backgroundColor: "#FDF7FA" }}>
+      <header className="py-4 text-center border-b border-gray-100 relative" style={{ backgroundColor: "#FDF7FA" }}>
         <h1 className="text-xl font-bold text-black">ホーム</h1>
+        <button
+          onClick={handleLogout}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 hover:text-gray-800"
+        >
+          ログアウト
+        </button>
       </header>
 
       {/* Main Content */}
@@ -123,5 +136,22 @@ export default function MovingApp() {
         </div>
       </nav>
     </div>
+  )
+}
+
+export default function MovingApp() {
+  return (
+    <ProtectedRoute
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <MovingAppContent />
+    </ProtectedRoute>
   )
 }

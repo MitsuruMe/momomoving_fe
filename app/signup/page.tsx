@@ -10,6 +10,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
 import { registerSchema, formatPostalCode } from "@/lib/utils/validation"
+import { API_ENDPOINTS } from "@/lib/config/env"
 import type { RegisterRequest } from "@/lib/types"
 
 export default function SignupPage() {
@@ -49,7 +50,7 @@ export default function SignupPage() {
     setRegisterError(null)
 
     try {
-      const response = await fetch('https://momomoving-be.onrender.com/auth/register', {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

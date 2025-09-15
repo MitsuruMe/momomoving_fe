@@ -1,5 +1,7 @@
 // API クライアント設定
-const API_BASE_URL = 'https://momomoving-be.onrender.com'
+import { env } from '@/lib/config/env'
+
+const API_BASE_URL = env.API_BASE_URL
 
 export interface ApiResponse<T> {
   data?: T

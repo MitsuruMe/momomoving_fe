@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
 import { AuthState, User } from '@/lib/types'
+import { API_ENDPOINTS } from '@/lib/config/env'
 
 // 認証アクションの型定義
 type AuthAction =
@@ -101,7 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (token) {
         try {
           // ユーザー情報を取得してトークンの有効性を確認
-          const response = await fetch('https://momomoving-be.onrender.com/users/me', {
+          const response = await fetch(API_ENDPOINTS.USER_ME, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -136,7 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'LOGIN_START' })
 
     try {
-      const response = await fetch('https://momomoving-be.onrender.com/auth/login', {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { access_token } = await response.json()
 
         // ユーザー情報を取得
-        const userResponse = await fetch('https://momomoving-be.onrender.com/users/me', {
+        const userResponse = await fetch(API_ENDPOINTS.USER_ME, {
           headers: {
             'Authorization': `Bearer ${access_token}`,
             'Content-Type': 'application/json',

@@ -17,7 +17,7 @@ export interface ApiError {
 
 class ApiClient {
   private baseURL: string
-  private defaultHeaders: HeadersInit
+  private defaultHeaders: Record<string, string>
 
   constructor(baseURL: string = API_BASE_URL) {
     this.baseURL = baseURL

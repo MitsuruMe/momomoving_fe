@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 interface Property {
   id: string
@@ -16,7 +17,7 @@ interface Property {
   image: string
 }
 
-export default function PropertiesPage() {
+function PropertiesContent() {
   const router = useRouter()
   const [selectedProperty, setSelectedProperty] = useState<string>("1")
 
@@ -139,5 +140,22 @@ export default function PropertiesPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+export default function PropertiesPage() {
+  return (
+    <ProtectedRoute
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <PropertiesContent />
+    </ProtectedRoute>
   )
 }

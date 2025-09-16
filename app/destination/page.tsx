@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
-export default function DestinationPage() {
+function DestinationContent() {
   const [stationName, setStationName] = useState("")
   const router = useRouter()
 
@@ -115,5 +116,22 @@ export default function DestinationPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+export default function DestinationPage() {
+  return (
+    <ProtectedRoute
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <DestinationContent />
+    </ProtectedRoute>
   )
 }

@@ -137,12 +137,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'LOGIN_START' })
 
     try {
+      // OAuth2PasswordRequestFormを使用するため、フォームデータとして送信
+      const formData = new FormData()
+      formData.append('username', username)
+      formData.append('password', password)
+
       const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        body: formData,
       })
 
       if (response.ok) {
@@ -172,9 +174,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       const errorData = await response.json()
+
+      // FastAPIのバリデーションエラーハンドリング
+      let errorMessage = 'ログインに失敗しました'
+      if (errorData.detail) {
+        if (Array.isArray(errorData.detail)) {
+          // バリデーションエラーの場合
+          errorMessage = errorData.detail.map((err: any) => err.msg).join(', ')
+        } else if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail
+        }
+      }
+
       dispatch({
         type: 'LOGIN_FAILURE',
-        payload: errorData.detail || 'ログインに失敗しました'
+        payload: errorMessage
       })
       return false
 

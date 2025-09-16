@@ -3,19 +3,14 @@
 import { useRouter } from "next/navigation"
 import { Check, Home, Search, Star, MoreHorizontal, Circle } from "lucide-react"
 import ProtectedRoute from "@/components/ProtectedRoute"
-import { useAuth } from "@/context/AuthContext"
 import { useUser } from "@/hooks/useUser"
 import { useTasks } from "@/hooks/useTasks"
 
 function MovingAppContent() {
   const router = useRouter()
-  const { logout } = useAuth()
   const { user, loading: userLoading, error: userError } = useUser()
   const { tasks, loading: tasksLoading, error: tasksError, getCompletionRate } = useTasks()
 
-  const handleLogout = () => {
-    logout()
-  }
 
   // ローディング状態
   if (userLoading || tasksLoading) {
@@ -67,14 +62,8 @@ function MovingAppContent() {
   return (
     <div className="w-full max-w-sm mx-auto min-h-screen bg-white relative">
       {/* Header */}
-      <header className="py-4 text-center border-b border-gray-100 relative" style={{ backgroundColor: "#FDF7FA" }}>
+      <header className="py-4 text-center border-b border-gray-100" style={{ backgroundColor: "#FDF7FA" }}>
         <h1 className="text-xl font-bold text-black">ホーム</h1>
-        <button
-          onClick={handleLogout}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 hover:text-gray-800"
-        >
-          ログアウト
-        </button>
       </header>
 
       {/* Main Content */}

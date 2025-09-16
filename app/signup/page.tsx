@@ -15,7 +15,7 @@ import type { RegisterRequest } from "@/lib/types"
 
 export default function SignupPage() {
   const router = useRouter()
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, login } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [registerError, setRegisterError] = useState<string | null>(null)
 
@@ -59,14 +59,37 @@ export default function SignupPage() {
       })
 
       if (response.ok) {
-        // 登録成功後、目的地選択画面へ遷移
-        router.push("/destination")
+        // 登録成功後、自動的にログインしてオンボーディング（目的地選択）へ遷移
+        console.log('Registration successful, attempting login...')
+        const loginSuccess = await login(data.username, data.password)
+        console.log('Login success:', loginSuccess)
+        if (loginSuccess) {
+          console.log('Redirecting to /destination...')
+          // ログインページのuseEffectによる干渉を避けるため、少し遅延させる
+          setTimeout(() => {
+            router.replace("/destination")
+          }, 100)
+        } else {
+          // ログインに失敗した場合はログイン画面へ
+          console.log('Login failed, redirecting to /login')
+          router.push("/login")
+        }
       } else {
         const errorData = await response.json()
         if (response.status === 409) {
           setRegisterError('このユーザーIDは既に登録されています')
         } else {
-          setRegisterError(errorData.detail || '新規登録に失敗しました')
+          // FastAPIのバリデーションエラーハンドリング
+          let errorMessage = '新規登録に失敗しました'
+          if (errorData.detail) {
+            if (Array.isArray(errorData.detail)) {
+              // バリデーションエラーの場合
+              errorMessage = errorData.detail.map((err: any) => err.msg).join(', ')
+            } else if (typeof errorData.detail === 'string') {
+              errorMessage = errorData.detail
+            }
+          }
+          setRegisterError(errorMessage)
         }
       }
     } catch (error) {

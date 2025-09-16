@@ -3,8 +3,11 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
-export default function PreferencesPage() {
+function PreferencesContent() {
+  const router = useRouter()
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>(["NURO OK"])
 
   const preferences = [
@@ -70,12 +73,29 @@ export default function PreferencesPage() {
       {/* Bottom Button */}
       <div className="max-w-sm mx-auto px-6 pb-8">
         <Button
-          onClick={() => (window.location.href = "/properties")}
+          onClick={() => router.push("/properties")}
           className="w-full h-14 bg-red-500 hover:bg-red-600 text-white text-lg font-medium rounded-full"
         >
           次へ
         </Button>
       </div>
     </div>
+  )
+}
+
+export default function PreferencesPage() {
+  return (
+    <ProtectedRoute
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <PreferencesContent />
+    </ProtectedRoute>
   )
 }

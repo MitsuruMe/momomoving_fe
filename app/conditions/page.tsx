@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
-export default function ConditionsPage() {
+function ConditionsContent() {
   const router = useRouter()
   const [rent, setRent] = useState([50])
   const [area, setArea] = useState([30])
@@ -93,5 +94,22 @@ export default function ConditionsPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+export default function ConditionsPage() {
+  return (
+    <ProtectedRoute
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <ConditionsContent />
+    </ProtectedRoute>
   )
 }

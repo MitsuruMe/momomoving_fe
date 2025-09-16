@@ -30,19 +30,12 @@ export interface AuthError {
   detail: string
 }
 
+import { User } from './user'
+
 export interface AuthState {
   isAuthenticated: boolean
   user: User | null
   token: string | null
   loading: boolean
   error: string | null
-}
-
-export interface User {
-  user_id: string
-  username: string
-  full_name: string
-  phone_number: string | null
-  current_postal_code: string
-  move_date: string
 }

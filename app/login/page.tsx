@@ -106,14 +106,14 @@ export default function LoginPage() {
           {/* User ID Field */}
           <div className="space-y-2">
             <Label htmlFor="username" className="text-black text-base font-medium">
-              ユーザーID（メールアドレス）
+              ユーザーID
             </Label>
             <Input
               id="username"
-              type="email"
+              type="text"
               {...register("username")}
               className="w-full h-12 bg-gray-200 border-0 rounded-lg text-black placeholder:text-gray-500"
-              placeholder="example@email.com"
+              placeholder="user123"
             />
             {errors.username && (
               <p className="text-red-500 text-sm">{errors.username.message}</p>

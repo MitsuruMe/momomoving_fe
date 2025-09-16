@@ -64,7 +64,7 @@ export default function SignupPage() {
       } else {
         const errorData = await response.json()
         if (response.status === 409) {
-          setRegisterError('このメールアドレスは既に登録されています')
+          setRegisterError('このユーザーIDは既に登録されています')
         } else {
           setRegisterError(errorData.detail || '新規登録に失敗しました')
         }
@@ -123,14 +123,14 @@ export default function SignupPage() {
           {/* User ID Field */}
           <div className="space-y-2">
             <Label htmlFor="username" className="text-black text-base font-medium">
-              ユーザーID（メールアドレス）
+              ユーザーID
             </Label>
             <Input
               id="username"
-              type="email"
+              type="text"
               {...register("username")}
               className="w-full h-12 bg-gray-200 border-0 rounded-lg text-black"
-              placeholder="example@email.com"
+              placeholder="user123"
             />
             {errors.username && (
               <p className="text-red-500 text-sm">{errors.username.message}</p>

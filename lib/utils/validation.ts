@@ -6,8 +6,7 @@ import { z } from 'zod'
 export const loginSchema = z.object({
   username: z
     .string()
-    .min(1, 'ユーザーIDは必須です')
-    .email('有効なメールアドレスを入力してください'),
+    .min(1, 'ユーザーIDは必須です'),
   password: z
     .string()
     .min(1, 'パスワードは必須です')
@@ -19,7 +18,9 @@ export const registerSchema = z.object({
   username: z
     .string()
     .min(1, 'ユーザーIDは必須です')
-    .email('有効なメールアドレスを入力してください'),
+    .min(3, 'ユーザーIDは3文字以上で入力してください')
+    .max(50, 'ユーザーIDは50文字以内で入力してください')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'ユーザーIDは英数字、アンダースコア、ハイフンのみ使用できます'),
   password: z
     .string()
     .min(6, 'パスワードは6文字以上で入力してください')

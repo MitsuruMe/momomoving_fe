@@ -1,44 +1,68 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Check, Home, Search, Star, MoreHorizontal } from "lucide-react"
+import { Check, Home, Search, Star, MoreHorizontal, Circle } from "lucide-react"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/context/AuthContext"
+import { useUser } from "@/hooks/useUser"
+import { useTasks } from "@/hooks/useTasks"
 
 function MovingAppContent() {
   const router = useRouter()
   const { logout } = useAuth()
-
-  const tasks = [
-    {
-      id: 1,
-      title: "不要なものの処分",
-      subtitle: "身軽に新生活を始めましょう",
-      completed: true,
-    },
-    {
-      id: 2,
-      title: "インターネット選び",
-      subtitle: "サクサクネットを楽しもう！",
-      completed: true,
-    },
-    {
-      id: 3,
-      title: "火災保険を選ぼう",
-      subtitle: "リーズナブルかつ安心な保険を選ぼう",
-      completed: true,
-    },
-    {
-      id: 4,
-      title: "転出届を出そう",
-      subtitle: "今住んでいる自治体にお別れを告げよう",
-      completed: true,
-    },
-  ]
+  const { user, loading: userLoading, error: userError } = useUser()
+  const { tasks, loading: tasksLoading, error: tasksError, getCompletionRate } = useTasks()
 
   const handleLogout = () => {
     logout()
   }
+
+  // ローディング状態
+  if (userLoading || tasksLoading) {
+    return (
+      <div className="w-full max-w-sm mx-auto min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // エラー状態
+  if (userError || tasksError) {
+    return (
+      <div className="w-full max-w-sm mx-auto min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center p-4">
+          <p className="text-red-600 mb-4">{userError || tasksError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            再読み込み
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // 引っ越し予定日までの残り日数計算
+  const getDaysUntilMove = (): number => {
+    if (!user?.move_date) return 0
+
+    const moveDate = new Date(user.move_date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    moveDate.setHours(0, 0, 0, 0)
+
+    const diffTime = moveDate.getTime() - today.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    return Math.max(0, diffDays)
+  }
+
+  const daysUntilMove = getDaysUntilMove()
+  const completionRate = getCompletionRate()
 
   return (
     <div className="w-full max-w-sm mx-auto min-h-screen bg-white relative">
@@ -59,7 +83,7 @@ function MovingAppContent() {
         <div className="text-center py-6 bg-pink-50 mx-[-16px] px-4 mb-2" style={{ backgroundColor: "#FDF7FA" }}>
           <h2 className="text-lg text-black mb-4 font-medium">引越しまであと</h2>
           <div className="text-7xl font-black text-black mb-6 leading-none">
-            10<span className="text-5xl font-black">日</span>
+            {daysUntilMove}<span className="text-5xl font-black">日</span>
           </div>
 
           {/* Progress Bar */}
@@ -69,11 +93,11 @@ function MovingAppContent() {
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
                   className="h-2 rounded-full transition-all duration-300"
-                  style={{ width: "80%", backgroundColor: "#ef4444" }}
+                  style={{ width: `${completionRate}%`, backgroundColor: "#ef4444" }}
                 ></div>
               </div>
             </div>
-            <span className="text-sm font-bold text-black">80%</span>
+            <span className="text-sm font-bold text-black">{completionRate}%</span>
           </div>
         </div>
 
@@ -90,26 +114,46 @@ function MovingAppContent() {
           <h3 className="text-lg font-bold text-black mb-4 px-2">タスクリスト</h3>
 
           <div className="space-y-3">
-            {tasks.map((task) => (
-              <div key={task.id} className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex items-start justify-between p-4">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-0.5">
-                      <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
-                        <Check className="w-4 h-4 text-white stroke-2" />
+            {tasks.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>タスクがありません</p>
+              </div>
+            ) : (
+              tasks.map((task) => (
+                <div key={task.user_task_id} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="flex items-start justify-between p-4">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="mt-0.5">
+                        {task.status === 'completed' ? (
+                          <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white stroke-2" />
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 border-2 border-gray-300 rounded flex items-center justify-center">
+                            <Circle className="w-3 h-3 text-gray-300" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className={`font-bold mb-1 text-base ${task.status === 'completed' ? 'text-gray-500 line-through' : 'text-black'}`}>
+                          {task.task_name}
+                        </h4>
+                        <p className="text-gray-600 text-sm leading-relaxed">{task.description}</p>
+                        {task.custom_notes && (
+                          <p className="text-blue-600 text-xs mt-1 italic">メモ: {task.custom_notes}</p>
+                        )}
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-black mb-1 text-base">{task.title}</h4>
-                      <p className="text-gray-600 text-sm leading-relaxed">{task.subtitle}</p>
-                    </div>
+                    <button
+                      className="detail-button"
+                      onClick={() => router.push(`/tasks/${task.user_task_id}`)}
+                    >
+                      詳細
+                    </button>
                   </div>
-                  <button className="detail-button" onClick={() => router.push(`/tasks/${task.id}`)}>
-                    詳細
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
       </main>

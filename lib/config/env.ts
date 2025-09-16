@@ -54,11 +54,16 @@ export const validateEnv = () => {
 }
 
 // 環境変数のログ出力（開発時のみ）
-if (env.IS_DEVELOPMENT) {
+if (typeof window !== 'undefined') {
   console.log('Environment Configuration:', {
     API_BASE_URL: env.API_BASE_URL,
     NODE_ENV: env.NODE_ENV,
     APP_NAME: env.APP_NAME,
     APP_VERSION: env.APP_VERSION,
+  })
+  console.log('API Endpoints:', {
+    LOGIN: API_ENDPOINTS.LOGIN,
+    REGISTER: API_ENDPOINTS.REGISTER,
+    USER_ME: API_ENDPOINTS.USER_ME,
   })
 }

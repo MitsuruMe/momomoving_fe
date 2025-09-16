@@ -34,7 +34,7 @@ class ApiClient {
   }
 
   private getHeaders(includeAuth: boolean = true): HeadersInit {
-    const headers = { ...this.defaultHeaders }
+    const headers: Record<string, string> = { ...this.defaultHeaders }
 
     if (includeAuth) {
       const token = this.getAuthToken()

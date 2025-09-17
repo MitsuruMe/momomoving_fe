@@ -1,34 +1,43 @@
 // 物件関連の型定義
 
+// 物件の基本情報（検索結果用）
 export interface Property {
   property_id: string
   property_name: string
   rent: number
-  nearest_station?: string
-  walk_minutes?: number
-  room_layout?: string
-  floor_area?: number
-  build_year?: number
+  nearest_station: string
+  walk_minutes: number
+  room_layout: string
   nuro_available: boolean
   sonet_available: boolean
   image_urls: string[]
   tags: string[]
-  address?: string
-  facilities?: PropertyFacilities
 }
 
+// 物件の詳細情報
+export interface PropertyDetails extends Property {
+  address: string
+  floor_area: number
+  build_year: number
+  floor: string
+  facilities: PropertyFacilities
+  description?: string
+}
+
+// 物件設備情報
 export interface PropertyFacilities {
-  auto_lock?: boolean
-  separate_bathroom?: boolean
-  balcony?: boolean
-  parking?: boolean
-  pet_friendly?: boolean
-  elevator?: boolean
-  security_camera?: boolean
-  delivery_box?: boolean
-  internet_ready?: boolean
+  auto_lock: boolean
+  separate_bathroom: boolean
+  balcony: boolean
+  parking: boolean
+  pet_allowed: boolean
+  furnished: boolean
+  air_conditioning: boolean
+  washing_machine: boolean
+  security_camera: boolean
 }
 
+// 物件検索のクエリパラメータ
 export interface PropertySearchParams {
   max_rent?: number
   nearest_station?: string
@@ -42,18 +51,8 @@ export interface PropertySearchParams {
   tags?: string[]
 }
 
-export interface PropertyListResponse extends Array<Property> {}
-
-export interface PropertyDetailResponse extends Property {}
-
-// フロントエンド表示用の物件型
-export interface DisplayProperty {
-  id: string
-  name: string
-  price: string
-  details: string
-  internetTag: string
-  internetTagColor: string
-  amenities: string[]
-  image: string
+// ユーザーの物件選択情報
+export interface UserPropertySelection {
+  property_id: string | null
+  selected_at?: string
 }

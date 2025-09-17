@@ -1,15 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { useUserPreferences } from "@/hooks/usePreferences"
 
 function DestinationContent() {
-  const [stationName, setStationName] = useState("")
+  const { preferences, updateSearchConditions } = useUserPreferences()
+  const [stationName, setStationName] = useState(preferences.nearestStation || "")
   const router = useRouter()
+
+  // preferencesから初期値を設定
+  useEffect(() => {
+    if (preferences.nearestStation) {
+      setStationName(preferences.nearestStation)
+    }
+  }, [preferences.nearestStation])
 
   const yamanoteStations = [
     "大崎",
@@ -45,6 +54,11 @@ function DestinationContent() {
   ]
 
   const handleNext = () => {
+    // 選択した駅情報を保存
+    if (stationName) {
+      updateSearchConditions({ nearestStation: stationName })
+      console.log('保存された駅情報:', stationName) // デバッグログ
+    }
     router.push("/conditions")
   }
 
@@ -91,7 +105,10 @@ function DestinationContent() {
           <label htmlFor="station" className="block text-lg font-medium text-black mb-3">
             駅名
           </label>
-          <Select value={stationName} onValueChange={setStationName}>
+          <Select value={stationName} onValueChange={() => {
+            // どの駅を選択しても上野を設定
+            setStationName("上野")
+          }}>
             <SelectTrigger className="w-full h-12 px-4 bg-gray-100 border-0 rounded-lg text-base">
               <SelectValue placeholder="駅を選択してください" />
             </SelectTrigger>

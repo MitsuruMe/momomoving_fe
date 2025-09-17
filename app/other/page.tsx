@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Home, Search, Star, MoreHorizontal } from "lucide-react"
+import { Home, Search, Star, MoreHorizontal, Target } from "lucide-react"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useAuth } from "@/context/AuthContext"
 import { useUser } from "@/hooks/useUser"
@@ -76,6 +76,10 @@ function OtherContent() {
           <button className="flex flex-col items-center py-1" onClick={() => router.push("/search")}>
             <Search className="w-6 h-6 text-gray-400 mb-0.5" />
             <span className="text-xs text-gray-500">物件検索</span>
+          </button>
+          <button className="flex flex-col items-center py-1" onClick={() => router.push("/missions")}>
+            <Target className="w-6 h-6 text-gray-400 mb-0.5" />
+            <span className="text-xs text-gray-500">ミッション</span>
           </button>
           <button className="flex flex-col items-center py-1" onClick={() => router.push("/badges")}>
             <Star className="w-6 h-6 text-gray-400 mb-0.5" />

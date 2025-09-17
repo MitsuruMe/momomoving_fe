@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { ChevronLeft, Home, Search, Star, MoreHorizontal, Check, Circle } from "lucide-react"
+import { ChevronLeft, Home, Search, Star, MoreHorizontal, Check, Circle, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
 import { useTasks } from "@/hooks/useTasks"
+import { useUser } from "@/hooks/useUser"
+import { useBulkWasteInfo } from "@/hooks/useAI"
 import type { Task } from "@/lib/types"
 
 export default function TaskDetailPage() {
@@ -14,11 +16,20 @@ export default function TaskDetailPage() {
   const params = useParams()
   const taskId = params.id as string
   const { tasks, updateTaskStatus, loading, error } = useTasks()
+  const { user } = useUser()
 
   const [task, setTask] = useState<Task | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
   const [customNotes, setCustomNotes] = useState("")
   const [updateError, setUpdateError] = useState<string | null>(null)
+
+  // 不用品処分タスクの場合のみ粗大ゴミ情報を取得
+  const shouldFetchWasteInfo = task?.task_name.includes('不用品の処分') || false
+  console.log('不用品処分タスクかどうか:', shouldFetchWasteInfo)
+
+  const { wasteInfo, loading: wasteLoading, error: wasteError } = useBulkWasteInfo(shouldFetchWasteInfo)
+
+  console.log('粗大ゴミ情報状態:', { wasteInfo, wasteLoading, wasteError })
 
   // タスクデータの取得
   useEffect(() => {
@@ -200,6 +211,121 @@ export default function TaskDetailPage() {
           </div>
         </div>
 
+        {/* Internet PR Section */}
+        {task.task_name.includes('インターネット') && (
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-6">
+            <h3 className="text-lg font-bold text-black mb-4">おすすめなインターネット回線！</h3>
+
+            <div className="border border-gray-300 rounded-lg p-6 relative">
+              {/* PR Label */}
+              <div className="absolute top-2 right-2">
+                <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">PR</span>
+              </div>
+
+              {/* NURO Logo */}
+              <div className="text-center mb-4">
+                <div className="inline-block bg-black text-white px-6 py-3 rounded font-bold text-xl">
+                  NURO 光
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-sm text-gray-700 leading-relaxed mb-6">
+                下り最大10Gbps または 2Gbpsのプランが選べる高速光回線
+              </p>
+
+              {/* Apply Button */}
+              <div className="text-right">
+                <button
+                  onClick={() => {
+                    // フロントのみの実装：実際の申し込み機能は未実装
+                    alert('NURO光申し込みページへの遷移（実装予定）')
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full text-sm transition-colors"
+                >
+                  申し込む
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fire Insurance PR Section */}
+        {task.task_name.includes('火災保険') && (
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-6">
+            <h3 className="text-lg font-bold text-black mb-4">引越し先でおすすめな火災保険</h3>
+
+            <div className="border border-gray-300 rounded-lg p-6 relative">
+              {/* PR Label */}
+              <div className="absolute top-2 right-2">
+                <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">PR</span>
+              </div>
+
+              <div className="flex items-start gap-4">
+                {/* Sony Fire Insurance Logo */}
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-16 border-2 border-orange-400 bg-orange-50 rounded flex flex-col items-center justify-center text-center">
+                    <div className="text-orange-600 text-xs font-bold leading-tight">
+                      新ネット<br />火災保険
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="flex-1">
+                  <p className="text-sm text-gray-700 leading-relaxed mb-6">
+                    ソニー損保の新ネット火災保険なら、補償の組み合せが自由だから、必要な補償に絞って選べます
+                  </p>
+                </div>
+              </div>
+
+              {/* Apply Button */}
+              <div className="text-right mt-4">
+                <button
+                  onClick={() => {
+                    // フロントのみの実装：実際の申し込み機能は未実装
+                    alert('ソニー損保火災保険申し込みページへの遷移（実装予定）')
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full text-sm transition-colors"
+                >
+                  申し込む
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bulk Waste Collection Info Section */}
+        {task.task_name.includes('不用品の処分') && (
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-black">粗大ゴミ回収情報</h3>
+              <div className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold">MOMO AI</span>
+              </div>
+            </div>
+
+            {wasteLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+                <p className="text-gray-600 text-sm">粗大ゴミ情報を取得中...</p>
+              </div>
+            ) : wasteError ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 text-sm">粗大ゴミ情報の取得に失敗しました</p>
+              </div>
+            ) : wasteInfo ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{wasteInfo.info}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-600 text-sm">粗大ゴミ情報が見つかりませんでした</p>
+            )}
+          </div>
+        )}
+
         {/* Motivational Section */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
@@ -223,6 +349,10 @@ export default function TaskDetailPage() {
           <button onClick={() => router.push("/search")} className="flex flex-col items-center py-1">
             <Search className="w-6 h-6 text-gray-400 mb-0.5" />
             <span className="text-xs text-gray-500">物件検索</span>
+          </button>
+          <button onClick={() => router.push("/missions")} className="flex flex-col items-center py-1">
+            <Target className="w-6 h-6 text-gray-400 mb-0.5" />
+            <span className="text-xs text-gray-500">ミッション</span>
           </button>
           <button onClick={() => router.push("/badges")} className="flex flex-col items-center py-1">
             <Star className="w-6 h-6 text-gray-400 mb-0.5" />

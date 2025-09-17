@@ -2,7 +2,7 @@
 
 export const env = {
   // API Configuration
-  API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://momomoving-be.onrender.com',
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
 
   // App Configuration
   APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'ももとお引っ越し',
@@ -28,8 +28,8 @@ export const API_ENDPOINTS = {
   TASK_BY_ID: (id: string) => `${env.API_BASE_URL}/api/v1/tasks/${id}`,
 
   // Properties
-  PROPERTIES: `${env.API_BASE_URL}/api/v1/properties`,
-  PROPERTY_BY_ID: (id: string) => `${env.API_BASE_URL}/api/v1/properties/${id}`,
+  PROPERTIES: `${env.API_BASE_URL}/api/v1/properties/`,
+  PROPERTY_BY_ID: (id: string) => `${env.API_BASE_URL}/api/v1/properties/${id}/`,
 
   // AI
   AI_SUGGESTIONS: `${env.API_BASE_URL}/api/v1/ai/suggestions`,

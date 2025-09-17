@@ -1,16 +1,40 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Check, Home, Search, Star, MoreHorizontal, Circle } from "lucide-react"
+import { Check, Home, Search, Star, MoreHorizontal, Circle, Target } from "lucide-react"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import { useUser } from "@/hooks/useUser"
 import { useTasks } from "@/hooks/useTasks"
+import { useAISuggestions } from "@/hooks/useAI"
 
 function MovingAppContent() {
   const router = useRouter()
   const { user, loading: userLoading, error: userError } = useUser()
   const { tasks, loading: tasksLoading, error: tasksError, getCompletionRate } = useTasks()
 
+  // 引っ越し予定日までの残り日数計算
+  const getDaysUntilMove = (): number => {
+    if (!user?.move_date) return 0
+
+    const moveDate = new Date(user.move_date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    moveDate.setHours(0, 0, 0, 0)
+
+    const diffTime = moveDate.getTime() - today.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    return Math.max(0, diffDays)
+  }
+
+  const daysUntilMove = getDaysUntilMove()
+  const completionRate = getCompletionRate()
+
+  const { suggestion: aiSuggestion, loading: aiLoading, error: aiError } = useAISuggestions({
+    context: 'moving_preparation',
+    days_until_move: daysUntilMove,
+    completion_rate: completionRate
+  })
 
   // ローディング状態
   if (userLoading || tasksLoading) {
@@ -40,24 +64,6 @@ function MovingAppContent() {
       </div>
     )
   }
-
-  // 引っ越し予定日までの残り日数計算
-  const getDaysUntilMove = (): number => {
-    if (!user?.move_date) return 0
-
-    const moveDate = new Date(user.move_date)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    moveDate.setHours(0, 0, 0, 0)
-
-    const diffTime = moveDate.getTime() - today.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    return Math.max(0, diffDays)
-  }
-
-  const daysUntilMove = getDaysUntilMove()
-  const completionRate = getCompletionRate()
 
   return (
     <div className="w-full max-w-sm mx-auto min-h-screen bg-white relative">
@@ -90,9 +96,19 @@ function MovingAppContent() {
           </div>
         </div>
 
-        {/* Mascot and Encouragement */}
+        {/* AI Suggestion and Mascot */}
         <div className="flex items-center justify-between mb-8 px-2">
-          <p className="text-black text-sm font-medium flex-1 pr-4">もう少しで新生活だね！頑張ろう！</p>
+          <div className="flex-1 pr-4">
+            {aiLoading ? (
+              <p className="text-black text-sm font-medium">アドバイスを読み込み中...</p>
+            ) : aiError ? (
+              <p className="text-black text-sm font-medium">もう少しで新生活だね！頑張ろう！</p>
+            ) : aiSuggestion ? (
+              <p className="text-black text-sm font-medium leading-relaxed">{aiSuggestion.suggestion}</p>
+            ) : (
+              <p className="text-black text-sm font-medium">もう少しで新生活だね！頑張ろう！</p>
+            )}
+          </div>
           <div className="w-20 h-20 flex-shrink-0">
             <img src="/images/momo.png" alt="Pink bear mascot" className="w-full h-full object-contain" />
           </div>
@@ -157,6 +173,10 @@ function MovingAppContent() {
           <button className="flex flex-col items-center py-1" onClick={() => router.push("/search")}>
             <Search className="w-6 h-6 text-gray-400 mb-0.5" />
             <span className="text-xs text-gray-500">物件検索</span>
+          </button>
+          <button className="flex flex-col items-center py-1" onClick={() => router.push("/missions")}>
+            <Target className="w-6 h-6 text-gray-400 mb-0.5" />
+            <span className="text-xs text-gray-500">ミッション</span>
           </button>
           <button className="flex flex-col items-center py-1" onClick={() => router.push("/badges")}>
             <Star className="w-6 h-6 text-gray-400 mb-0.5" />

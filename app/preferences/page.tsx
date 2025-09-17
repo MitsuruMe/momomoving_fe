@@ -1,31 +1,83 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { useUserPreferences } from "@/hooks/usePreferences"
 
 function PreferencesContent() {
   const router = useRouter()
-  const [selectedPreferences, setSelectedPreferences] = useState<string[]>(["NURO OK"])
+  const { preferences, updateSelectedTags, updateSearchConditions } = useUserPreferences()
+  const [selectedPreferences, setSelectedPreferences] = useState<string[]>(preferences.selectedTags || [])
 
-  const preferences = [
-    "バストイレ別",
+  // preferencesから初期値を設定
+  useEffect(() => {
+    const initialPreferences = [...(preferences.selectedTags || [])]
+
+    // 光回線の設定を初期状態に反映
+    if (preferences.nuroAvailable) {
+      initialPreferences.push("NURO光対応")
+    }
+    if (preferences.sonetAvailable) {
+      initialPreferences.push("So-net光対応")
+    }
+
+    setSelectedPreferences(initialPreferences)
+  }, [preferences.selectedTags, preferences.nuroAvailable, preferences.sonetAvailable])
+
+  const preferenceOptions = [
+    "バス・トイレ別",
     "エアコン",
     "駐車場",
     "2階以上",
     "ペット相談",
     "IH",
-    "NURO OK",
-    "ペットOK",
-    "au 光OK",
+    "NURO光対応",
+    "ペット可",
+    "So-net光対応",
   ]
 
   const togglePreference = (preference: string) => {
     setSelectedPreferences((prev) =>
       prev.includes(preference) ? prev.filter((p) => p !== preference) : [...prev, preference],
     )
+  }
+
+  const handleNext = () => {
+    // まず古いデータをクリア（デバッグ用）
+    console.log('=== プリファレンス保存開始 ===')
+    console.log('選択されたpreferences:', selectedPreferences)
+
+    // NURO光とSo-net光を別パラメータとして処理
+    const regularTags = selectedPreferences.filter(tag =>
+      tag !== "NURO光対応" && tag !== "So-net光対応"
+    )
+
+    const nuroSelected = selectedPreferences.includes("NURO光対応")
+    const sonetSelected = selectedPreferences.includes("So-net光対応")
+
+    console.log('正規タグ:', regularTags)
+    console.log('NURO選択:', nuroSelected)
+    console.log('So-net選択:', sonetSelected)
+
+    // タグと光回線の設定を保存
+    updateSelectedTags(regularTags)
+
+    // 光回線の設定を別途保存
+    updateSearchConditions({
+      nuroAvailable: nuroSelected || undefined,
+      sonetAvailable: sonetSelected || undefined
+    })
+
+    // 保存後の確認
+    setTimeout(() => {
+      const saved = localStorage.getItem('user_preferences')
+      console.log('保存後のLocalStorage:', saved)
+    }, 100)
+
+    router.push("/properties")
   }
 
   return (
@@ -51,7 +103,7 @@ function PreferencesContent() {
       {/* Main Content */}
       <div className="max-w-sm mx-auto px-6 flex-1">
         <div className="grid grid-cols-3 gap-4 mb-12">
-          {preferences.map((preference, index) => (
+          {preferenceOptions.map((preference, index) => (
             <button
               key={index}
               onClick={() => togglePreference(preference)}
@@ -73,10 +125,10 @@ function PreferencesContent() {
       {/* Bottom Button */}
       <div className="max-w-sm mx-auto px-6 pb-8">
         <Button
-          onClick={() => router.push("/properties")}
+          onClick={handleNext}
           className="w-full h-14 bg-red-500 hover:bg-red-600 text-white text-lg font-medium rounded-full"
         >
-          次へ
+          次へ ({selectedPreferences.length}個選択中)
         </Button>
       </div>
     </div>

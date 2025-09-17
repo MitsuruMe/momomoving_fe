@@ -87,7 +87,7 @@ export const getRecommendedProperties = async (): Promise<Property[]> => {
 
     console.log('LocalStorageから取得した設定:', userPreferences)
 
-    let searchParams: PropertySearchParams = {}
+    const searchParams: PropertySearchParams = {}
     let hasActiveSearchConditions = false
 
     if (userPreferences) {
